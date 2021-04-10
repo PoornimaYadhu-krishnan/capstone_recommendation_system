@@ -36,28 +36,29 @@ def Home():
 def age_pred():
     user_input = request.form['fn']
 
-    user_final_rating = pickle.load(open('pickle/recoEngine.pkl', 'rb'))
-    tfidf_vect=pickle.load(open("pickle/tfidfVectorizer.pkl", "rb"))
-    model=pickle.load(open("pickle/XGBClassifiermodel.pkl", "rb"))
-    products = user_final_rating.loc[user_input].sort_values(ascending=False)[0:20]
-    df_products=products.to_frame()
-    preprocessed_df.reset_index(drop=True,inplace = True)
-    recommdation_df = preprocessed_df[preprocessed_df['name'].isin(df_products[user_input].index)]
-    recommdation_df.reset_index(drop=True,inplace = True)
-    filter_df=recommdation_df[['name','reviews_rating','reviews_username','user_sentiment','reviews']]
-    filter_df.reset_index(drop=True,inplace = True)
-    transform_df=tfidf_vect.transform(recommdation_df['reviews'])
-    y_pred=model.predict(transform_df)
-    concat_df= pd.DataFrame({'Predictions': y_pred})
-    concat_df.reset_index(drop=True,inplace = True)
-    filter_df['Predictions']=concat_df['Predictions']
-    result_pred1 = filter_df.groupby('name').agg({'Predictions': 'mean'})
-    result_final=result_pred1.sort_values(by='Predictions',ascending=False).iloc[:5,:] 
-    result_list=list(result_final.index)
-
-
-
-    return  render_template('view.html',predictions=result_list)
+    try:
+        user_final_rating = pickle.load(open('pickle/recoEngine.pkl', 'rb'))
+        tfidf_vect=pickle.load(open("pickle/tfidfVectorizer.pkl", "rb"))
+        model=pickle.load(open("pickle/XGBClassifiermodel.pkl", "rb"))
+        products = user_final_rating.loc[user_input].sort_values(ascending=False)[0:20]
+        df_products=products.to_frame()
+        preprocessed_df.reset_index(drop=True,inplace = True)
+        recommdation_df = preprocessed_df[preprocessed_df['name'].isin(df_products[user_input].index)]
+        recommdation_df.reset_index(drop=True,inplace = True)
+        filter_df=recommdation_df[['name','reviews_rating','reviews_username','user_sentiment','reviews']]
+        filter_df.reset_index(drop=True,inplace = True)
+        transform_df=tfidf_vect.transform(recommdation_df['reviews'])
+        y_pred=model.predict(transform_df)
+        concat_df= pd.DataFrame({'Predictions': y_pred})
+        concat_df.reset_index(drop=True,inplace = True)
+        filter_df['Predictions']=concat_df['Predictions']
+        result_pred1 = filter_df.groupby('name').agg({'Predictions': 'mean'})
+        result_final=result_pred1.sort_values(by='Predictions',ascending=False).iloc[:5,:] 
+        result_list=list(result_final.index)
+        return  render_template('view.html',predictions=result_list)
+    
+    except:
+        return render_template('error.html')
 
 
 
