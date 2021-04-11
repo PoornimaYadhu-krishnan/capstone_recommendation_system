@@ -1,5 +1,5 @@
 
-# This is basically the heart of my flask 
+
 
 
 from flask import Flask, render_template, request, redirect, url_for
@@ -13,24 +13,21 @@ import xgboost
 
 app = Flask(__name__)  # intitialize the flaks app  # common 
 
-#loading the sparse file which have processed features
-# Raw File which have missing values , Outlier , ..
-
-# You can python to process and creat final DF or object which then pass in Pickle
 
 # loading the data 
-# here i am loading npz , you can load csv , xlsx , databse conenection 
+ 
 preprocessed_df  = pd.read_csv("dataset/preprocessed.csv",index_col=0)
-# here you can database connector 
-# external API (Twitter API )
 
-#Xtest_Scenerio1_for_flask  - holding my data whch will render on UI 
 
-# http:baseurl/age_prediction
+# index.html asking takes the user input
 
 @app.route('/')
 def Home():
     return render_template('index.html')
+
+#Predict button on bthe UI is linked to this endpoint, teh business logic lies here.
+
+#Load the pickle files and do process the data to be returned in view.html
 
 @app.route('/product_reco/',methods = ['POST'])
 def age_pred():
